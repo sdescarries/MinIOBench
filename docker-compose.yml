@@ -1,0 +1,59 @@
+---
+version: '3.7'
+
+networks:
+  segupnet:
+    name: segupnet
+
+services:
+
+  s3:
+    image: minio/minio:latest
+    container_name: s3
+    networks:
+      - segupnet
+    environment:
+      MINIO_ACCESS_KEY: "minio"
+      MINIO_SECRET_KEY: "miniosecret"
+    user: "${UGID-1000:100}"
+    expose:
+      - 9000
+    ports:
+      - target: 9000
+        published: 9000
+    tty: true
+    volumes:
+      - type: bind
+        source: "${PWD}/minio"
+        target: "/data"
+    command: server /data
+
+  miniomc:
+    image: minio/mc:latest
+    container_name: miniomc
+    networks:
+      - segupnet
+    tty: true
+    entrypoint:
+      - /bin/sh
+
+  s3cmd:
+    image: d3fk/s3cmd:latest
+    container_name: s3cmd
+    networks:
+      - segupnet
+    user: "${UGID-1000:100}"
+    volumes:
+      - type: bind
+        source: "${HOME}/Downloads"
+        target: "${HOME}/Downloads"
+        read_only: true
+      - type: bind
+        source: "${PWD}/s3cfg"
+        target: "/.s3cfg"
+        read_only: true
+    working_dir: "${HOME}/Downloads"
+    stdin_open: true
+    tty: true
+    entrypoint:
+      - /bin/sh
