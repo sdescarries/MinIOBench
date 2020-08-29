@@ -28,11 +28,22 @@ services:
         target: "/data"
     command: server /data
 
-  miniomc:
+  mc:
     image: minio/mc:latest
-    container_name: miniomc
+    container_name: mc
     networks:
       - segupnet
+    volumes:
+      - type: bind
+        source: "${HOME}/Downloads"
+        target: "${HOME}/Downloads"
+        read_only: true
+      - type: bind
+        source: "${PWD}/mc.json"
+        target: "/root/.mc/config.json"
+        read_only: true
+    working_dir: "${HOME}/Downloads"
+    stdin_open: true
     tty: true
     entrypoint:
       - /bin/sh
@@ -42,7 +53,6 @@ services:
     container_name: s3cmd
     networks:
       - segupnet
-    user: "${UGID-1000:100}"
     volumes:
       - type: bind
         source: "${HOME}/Downloads"
@@ -50,7 +60,7 @@ services:
         read_only: true
       - type: bind
         source: "${PWD}/s3cfg"
-        target: "/.s3cfg"
+        target: "/root/.s3cfg"
         read_only: true
     working_dir: "${HOME}/Downloads"
     stdin_open: true

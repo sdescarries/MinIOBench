@@ -6,12 +6,14 @@ mkdir -p minio
 docker-compose pull
 docker-compose up -d &&
 
-./wait-for-it.sh localhost:9000 -t 5 &&
+./wait-for-it.sh localhost:9000 -t 5 -q &&
 
-docker exec miniomc mc config host add minio http://s3:9000/ minio miniosecret --api S3v4 &&
-docker exec miniomc mc mb minio/data &&
-docker exec miniomc mc policy set download minio/data/ &&
-docker exec miniomc mc ls minio ||
+docker exec mc mc mb --ignore-existing s3/data &&
+docker exec mc mc policy set download s3/data &&
+docker exec mc mc ls s3/data &&
+
+docker exec s3cmd s3cmd ls s3://data ||
+
 exit 1
 
 cat << EOF

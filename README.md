@@ -22,7 +22,7 @@ Configures docker containers to interact with a **MinIO** server by `s3cmd`.
 ### Containers
 
 * **s3**: [MinIO server](http://localhost:9000/)
-* **miniomc**: MinIO client
+* **mc**: MinIO client
 * **s3cmd**: AWS S3 client
 
 ## Links
